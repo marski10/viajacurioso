@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"project/normalize"
+	"reflect"
 	"strings"
 
 	"gorm.io/driver/mysql"
-	_ "gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	_ "gorm.io/gorm"
 )
 
 type Connect struct {
@@ -22,9 +22,9 @@ type Connect struct {
 func newConnect() Connect {
 
 	return Connect{
-		url:     "url",
-		apiKey:  "key",
-		apiHost: "host",
+		url:     "https://countries-cities.p.rapidapi.com/",
+		apiKey:  "393041ad93msh827b230c12feec5p1f4dbdjsndde28001dfc8",
+		apiHost: "countries-cities.p.rapidapi.com",
 	}
 
 }
@@ -45,7 +45,7 @@ func GetListCoutry() []Country {
 
 	var apiConnect Connect = newConnect()
 
-	apiConnect.url = "endpoint"
+	apiConnect.url = "https://servicodados.ibge.gov.br/api/v1"
 
 	const (
 		endpoint = "/localidades/paises"
@@ -54,7 +54,7 @@ func GetListCoutry() []Country {
 	httpClient := &http.Client{}
 
 	//request, _ := http.NewRequest("GET", apiConnect.url+endpoint, nil)
-	request, _ := http.NewRequest("GET", "endpoint", nil)
+	request, _ := http.NewRequest("GET", "https://a723bc1c-afd1-4c42-b7a6-5a6bc6258baf.mock.pstmn.io/country", nil)
 
 	//request.Header.Add("X-RapidAPI-Key", apiConnect.apiKey)
 	//request.Header.Add("X-RapidAPI-Host", apiConnect.apiHost)
@@ -85,16 +85,6 @@ func GetListCoutry() []Country {
 
 }
 
-// func getDetailCountry(codeCountry string) {
-
-// 	var apiConnect Connect = newConnect()
-
-// 	const (
-// 		endpoint = ""
-// 	)
-
-// }
-
 type Countries struct {
 	gorm.Model
 	Name         string
@@ -102,8 +92,8 @@ type Countries struct {
 	Continent    string
 }
 
-func insertCountry(c Country) {
-	dsn := "user:password@tcp(127.0.0.0:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
+func insertCountry(c []Country) {
+	dsn := "root:my-secret-pw@tcp(some-mysql:3306)/country"
 	db, error := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if error != nil {
@@ -112,14 +102,9 @@ func insertCountry(c Country) {
 
 	db.AutoMigrate(&Countries{})
 
-	db.Create(Countries{Name: c.Nome, Abbreviation: c.ID.ISOALPHA2, Continent: c.SubRegiao.Regiao.Nome})
-
-}
-
-func main() {
-	var listCountry []Country = GetListCoutry()
-
-	for _, x := range listCountry {
-		insertCountry(x)
+	for _, x := range c {
+		db.Create(&Countries{Name: normalize.Text(x.Nome), Abbreviation: normalize.Text(x.ID.ISOALPHA2), Continent: normalize.Text(x.SubRegiao.Regiao.Nome)})
 	}
+
+	fmt.Println("type:", reflect.TypeOf(c))
 }
