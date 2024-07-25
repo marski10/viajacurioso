@@ -1,8 +1,13 @@
 package main
 
+import (
+	"project/country"
+	"project/states"
+)
+
 func main() {
-	var listCountry []Country = GetListCoutry()
+	listCountry := country.GetListCoutry()
+	country.InsertCountry(listCountry)
 
-	insertCountry(listCountry)
-
+	states.GetListStates()
 }

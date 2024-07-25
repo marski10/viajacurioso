@@ -1,33 +1,17 @@
-package main
+package country
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"project/normalize"
+	"project/utilities"
 	"reflect"
 	"strings"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
-
-type Connect struct {
-	url     string
-	apiKey  string
-	apiHost string
-}
-
-func newConnect() Connect {
-
-	return Connect{
-		url:     "https://countries-cities.p.rapidapi.com/",
-		apiKey:  "393041ad93msh827b230c12feec5p1f4dbdjsndde28001dfc8",
-		apiHost: "countries-cities.p.rapidapi.com",
-	}
-
-}
 
 type Country struct {
 	ID struct {
@@ -43,10 +27,10 @@ type Country struct {
 
 func GetListCoutry() []Country {
 
-	var apiConnect Connect = newConnect()
+	var apiConnect utilities.Connect = utilities.NewConnect()
 
-	apiConnect.url = "https://servicodados.ibge.gov.br/api/v1"
-
+	apiConnect.Url = "https://servicodados.ibge.gov.br/api/v1"
+	apiConnect.ApiKey = "apikey"
 	const (
 		endpoint = "/localidades/paises"
 	)
@@ -55,6 +39,7 @@ func GetListCoutry() []Country {
 
 	//request, _ := http.NewRequest("GET", apiConnect.url+endpoint, nil)
 	request, _ := http.NewRequest("GET", "https://a723bc1c-afd1-4c42-b7a6-5a6bc6258baf.mock.pstmn.io/country", nil)
+	request.Header.Add("x-api-key", apiConnect.ApiKey)
 
 	//request.Header.Add("X-RapidAPI-Key", apiConnect.apiKey)
 	//request.Header.Add("X-RapidAPI-Host", apiConnect.apiHost)
@@ -92,7 +77,7 @@ type Countries struct {
 	Continent    string
 }
 
-func insertCountry(c []Country) {
+func InsertCountry(c []Country) {
 	dsn := "root:my-secret-pw@tcp(some-mysql:3306)/country"
 	db, error := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
@@ -103,7 +88,7 @@ func insertCountry(c []Country) {
 	db.AutoMigrate(&Countries{})
 
 	for _, x := range c {
-		db.Create(&Countries{Name: normalize.Text(x.Nome), Abbreviation: normalize.Text(x.ID.ISOALPHA2), Continent: normalize.Text(x.SubRegiao.Regiao.Nome)})
+		db.Create(&Countries{Name: utilities.Text(x.Nome), Abbreviation: utilities.Text(x.ID.ISOALPHA2), Continent: utilities.Text(x.SubRegiao.Regiao.Nome)})
 	}
 
 	fmt.Println("type:", reflect.TypeOf(c))

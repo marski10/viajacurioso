@@ -1,8 +1,9 @@
-package normalize
+package utilities
 
 import (
 	"strings"
 	"unicode"
+
 	"golang.org/x/text/unicode/norm"
 )
 
@@ -51,4 +52,20 @@ func Text(text string) string {
 	text = strings.TrimSpace(text)
 
 	return text
+}
+
+type Connect struct {
+	Url     string
+	ApiKey  string
+	ApiHost string
+}
+
+func NewConnect() Connect {
+
+	return Connect{
+		Url:     "https://countries-cities.p.rapidapi.com/",
+		ApiKey:  "apikey",
+		ApiHost: "countries-cities.p.rapidapi.com",
+	}
+
 }
