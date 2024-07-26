@@ -26,11 +26,11 @@ type Country struct {
 }
 
 func GetListCoutry() []Country {
-
+	
 	var apiConnect utilities.Connect = utilities.NewConnect()
 
 	apiConnect.Url = "https://servicodados.ibge.gov.br/api/v1"
-	apiConnect.ApiKey = "apikey"
+	apiConnect.ApiKey = ""
 	const (
 		endpoint = "/localidades/paises"
 	)

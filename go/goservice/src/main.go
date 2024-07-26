@@ -10,4 +10,6 @@ func main() {
 	country.InsertCountry(listCountry)
 
 	states.GetListStates()
+
+	states.InsertStates()
 }
